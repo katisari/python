@@ -68,3 +68,44 @@ car5.display_all()
 
 car6=Car(20000000, "35mph", "Empty", "15mpg")
 car6.display_all()
+
+
+
+
+# Product
+
+class Product:
+    def __init__(self, price, item_name, weight, brand):
+        self.status = "for sale"
+        self.price = price
+        self.item_name = item_name
+        self.weight = weight
+        self.brand = brand
+
+    def sell(self):
+        self.status = "sold"
+        return self
+    def add_tax(self, tax):
+        self.price *= (1 + tax)
+        return self
+
+    def return_item(self, reason_for_return):
+        if reason_for_return == "defective":
+            self.status = "defective"
+            self.price = 0
+        if reason_for_return == "like new":
+            self.status = "for sale"
+        if reason_for_return == "opened":
+            self.status = "used"
+            self.price *= 0.8
+        return self
+    def display_info(self):
+        print("Price:", self.price)
+        print("Item name:", self.item_name)
+        print("Weight:", self.weight)
+        print("Brand:", self.brand)
+        print("Status:", self.status)
+        return self
+
+bottle = Product(3, "water bottle", "150g", "Ice Mountain")
+bottle.add_tax(0.2).display_info()
