@@ -19,11 +19,5 @@ def repeat(num, word):
     return (word + "\n") * int(num)
 
 
-
-
-
-
-
 if __name__ == "__main__":
     app.run(debug=True)
-
