@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ninja Gold</title>
+    <style>
+        form{
+            text-align:center;
+            width: 20%;
+            display:inline-block;
+            outline:1px solid black;
+            padding: 20px;
+        }
+
+        .showing_gold{
+            display:inline-block;
+            width: 200px;
+            outline:5px solid black;
+        }
+        .box{
+            display:inline-block;
+            outline: 2px solid black;
+            margin: 10px;
+            width: 90%;
+            height: 200px;
+        }
+        .gr{
+            color:green;
+        }
+        .rd{
+            color:red;
+        }
+    </style>
+</head>
+<body>
+    <div class="gold">Your gold: &emsp; 
+        <div class="showing_gold">{{session['total_gold']}}</div>
+    </div><br><br>
+    <form action="/process_money" method="post">
+        <h3>Farm</h3>
+        (earns 10-20 golds)<br><br>
+        <input type="hidden" name="building" value="farm" />
+        <input type="submit" value="Find Gold!"/>
+    </form>
+    <form action="/process_money" method="post">
+        <h3>Cave</h3>
+        (earns 5-10 golds)<br><br>
+        <input type="hidden" name="building" value="cave" />
+        <input type="submit" value="Find Gold!"/>
+    </form>
+    <form action="/process_money" method="post">
+        <h3>House</h3>
+        (earns 2-5 golds)<br><br>
+        <input type="hidden" name="building" value="house" />
+        <input type="submit" value="Find Gold!"/>
+    </form>
+    <form action="/process_money" method="post">
+        <h3>Casino</h3>
+        (earns/takes 0-50 golds)<br><br>
+        <input type="hidden" name="building" value="casino" />
+        <input type="submit" value="Find Gold!"/>
+    </form>
+    <div class="activity">
+        Activites:<br>
+        <div class="box" style="overflow-y: scroll">
+            {% for i in session['activity']%}
+                <span class="{{i[0]}}">{{i[1]}}</span><br>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
