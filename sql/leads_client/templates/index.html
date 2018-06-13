@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Leads and Clients Page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script>
+        window.onload = function () {
+        
+        var options = {
+            title: {
+                text: "Customer and number of new leads"
+            },
+            subtitles: [{
+                text: "As of June, 2018"
+            }],
+            animationEnabled: true,
+            data: [{
+                type: "pie",
+                startAngle: 40,
+                toolTipContent: "<b>{label}</b>: {y}%",
+                showInLegend: "true",
+                legendText: "{label}",
+                indexLabelFontSize: 16,
+                indexLabel: "{label} - {y}",
+                dataPoints: [
+                    {% for client in clients %}
+                    {y: {{client['num_leads']}} , label: "{{client['name']}}"},
+                    {% endfor %}
+                ]
+            }]
+        };
+        $("#chartContainer").CanvasJSChart(options);
+        
+        }
+    </script>
+
+</head>
+<body>
+    <form action="/time" method='post'>
+        Start: <input type="date" name="start_date">
+        End: <input type="date" name="end_date">
+        <input type="submit" value="Update">
+    </form>
+    <h2><u>List of all customers and # of leads</u></h2>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <td>Customer Name</td>
+                <td>Number of leads</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in clients %}
+            <tr>
+                <td>{{ client['name'] }}</td>
+                <td>{{ client['num_leads' ]}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+    <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+    
+</body>
+</html>
