@@ -32,24 +32,77 @@
         .border-bottom { border-bottom: 1px solid #e5e5e5; }
 
         .box-shadow { box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05); }
-    
+        .flashmg{
+            font-size: 150%;
+            color:green;
+        }
+        h5{
+            display:inline;
+        }
+        .top{
+            text-align:right;
+            outline:1px solid black;
+            font-size:200%;
+        }
+        .signout{
+            display:inline;
+        }
+        td{
+            width: 100px;
+        }
     
     </style>
 </head>
 <body>
-    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
-        <h5 class="my-0 mr-md-auto font-weight-normal"></h5>
-        <nav class="my-2 my-md-0 mr-md-3">
-            <a class="p-2 text-dark" href="#"></a>
-            <a class="p-2 text-dark" href="#"></a>
-            <a class="p-2 text-dark" href="#"></a>
-            <a class="p-2 text-dark" href="#"></a>
+    <div class="top">
+        <nav class"navbar navbar-light bg-light">
+            <h5 class="font-weight-normal">Welcome {{ session['name'] }}!</h5>
+            <form class="signout"action='/logoff' method='post'>
+                <input class="btn btn-outline-primary" type="submit" value="Sign off">
+            </form>
         </nav>
-        <form action='/logoff' method='post'>
-            <input class="btn btn-outline-primary" type="submit" value="Sign off">
-        </form>
     </div>
-    <h1>Welcome {{ session['name'] }}!</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <p class="flashmg">{{message}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <h2><u>{{counter}} Messages For You {{ session['name'] }}</u></h2>
+    {% if results %}
+        {% for result in results %}
+            {{result['sender']}} said ({{result['how_long_ago']}} ago):
+            <table class="table my_messages">
+                <tbody>
+                    <tr>
+                        <td>"{{ result['content'] }} "</td>
+                        <td><a href='/danger/{{result['receiver_id']}}/{{result['message_id']}}'>Delete</a></td>
+                    </tr>
+                </tbody>       
+            </table>
+        {% endfor %}
+    {% endif %}
+    <table class="table send_messages">
+        <h2><u>Send a message!</u></h2>
+        <tbody>
+            {% if session['user_info'] %}
+                {% for user in session['user_info'] %}
+                    {% if user['id'] != session['userid'] %}
+                        <form action="/sendmessage/{{user['id']}}" method='post'>
+                            <tr>
+                                <td>{{user['name']}}</td>
+                                <td><textarea name="comment" placeholder="Put comment here" name="comment"></textarea></td>
+                                <td><input type="submit" value="send"></td>
+                            </tr>
+                        </form>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </tbody>
+
+
+    </table>
     
 </body>
 </html>

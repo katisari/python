@@ -42,6 +42,9 @@ def process():
                     'password': pw_hash
                 }
                 mysql.query_db(query, data)
+                query = "SELECT * FROM users WHERE email=%(email)s"
+                outcome = mysql.query_db(query, data)
+                session['userid'] = outcome[0]['id']
                 session["name"] = request.form['name']
                 return redirect("/success")
 @app.route('/login', methods=['POST'])
@@ -65,10 +68,55 @@ def login():
     return redirect('/')
 @app.route('/success')
 def success():
-    return render_template("welcome.html")
+    session['user_info'] = mysql.query_db("SELECT * FROM users")
+
+
+    query = "SELECT messages.id AS message_id, users.name as sender, messages.content, receiver.name AS receiver, receiver.id as receiver_id, messages.created_at AS sent_at, CONCAT(FLOOR(HOUR(TIMEDIFF(NOW(), messages.created_at)) / 24), ' days ', MOD(HOUR(TIMEDIFF(NOW(), messages.created_at)), 24), ' hours ', MINUTE(TIMEDIFF(NOW(), messages.created_at)), ' minutes') AS how_long_ago FROM users JOIN messages ON users.id = messages.user_id JOIN users as receiver ON receiver.id = messages.friend_id WHERE receiver.id = %(receiver_id)s;"
+    data = {
+        'receiver_id': str(session['userid'])
+    }
+    results = mysql.query_db(query, data)
+    counter = 0
+    if results:
+        for result in results:
+            counter += 1
+    session['joined_query'] = results
+    print(counter)
+    print(results)
+    return render_template("welcome.html", results = results, counter=counter)
 @app.route('/logoff', methods=['POST'])
 def logoff():
     session.clear()
     return redirect('/')
+@app.route('/sendmessage/<id>', methods=['POST'])
+def sendmessage(id):
+    flash("Message Sent")
+    query = "INSERT INTO messages (content, user_id, friend_id, created_at) VALUES (%(content)s, %(user_id)s, %(receiver_id)s, NOW())"
+    data = {
+        'content' : request.form['comment'],
+        'user_id' : session['userid'],
+        'receiver_id' : id
+    }
+    mysql.query_db(query, data)
+    return redirect('/success')
+
+@app.route('/danger/<receiver_id>/<message_id>')
+def delete(receiver_id, message_id):
+    if session['joined_query']:
+        for row in session['joined_query']:
+            if row['message_id']:
+                if int(session['userid']) ==  int(receiver_id):
+                    query = "DELETE FROM messages WHERE id = %(mesg_id)s;"
+                    data = {
+                        'mesg_id': message_id
+                    }
+                    mysql.query_db(query, data)
+                    flash("Message successfully deleted")
+                    return redirect('/success')
+    ip_ad = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)  
+    session.clear()       
+    return render_template("danger.html", message_id = str(message_id), ip_ad = ip_ad)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
